@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "UserApplication",
+            "request": "launch",
+            "mainClass": "com.sss.user.UserApplication",
+            "projectName": "user"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch SSS Web",
+            "cwd": "${workspaceFolder}/sss-web",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["start"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "BROWSER": "none"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch SSS Web (Debug)",
+            "cwd": "${workspaceFolder}/sss-web",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["start"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+                "BROWSER": "none",
+                "GENERATE_SOURCEMAP": "false"
+            }
+        }
+    ]
+}
