@@ -1,0 +1,53 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: user
+  
+  # MongoDB Configuration using URI
+  data:
+    mongodb:
+      uri: mongodb://admin:password123@localhost:27017/sss_user_db?authSource=admin&retryWrites=true&w=majority
+      auto-index-creation: false
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/sss-realm
+          jwk-set-uri: http://localhost:8080/realms/sss-realm/protocol/openid-connect/certs
+
+# Logging Configuration
+logging:
+  level:
+    com.sss.user: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Application specific configuration
+app:
+  jwt:
+    secret: your-secret-key-here-make-it-long-and-secure
+    expiration: 86400000 # 24 hours in milliseconds
+
+# Keycloak Configuration
+keycloak:
+  realm: sss-realm
+  auth-server-url: http://localhost:8080
+  resource: sss-backend
+  credentials:
+    secret: your-client-secret-here
+  bearer-only: true
+  cors: true
+  # Admin client configuration for sync
+  admin:
+    username: admin
+    password: admin123
+    client-id: admin-cli
+
+
+

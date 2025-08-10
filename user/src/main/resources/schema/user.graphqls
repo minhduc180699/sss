@@ -1,0 +1,85 @@
+type Query {
+    user(id: ID!): UserDto
+    users: [UserDto!]!
+    currentUser: UserDto
+}
+
+type Mutation {
+    createUser(input: CreateUserInput!): UserDto
+    updateUser(id: ID!, input: UpdateUserInput!): UserDto
+    updateCurrentUser(input: UpdateUserInput!): UserDto
+}
+
+type UserDto {
+    id: ID!
+    username: String!
+    fullName: String!
+    email: String
+    phoneNumber: String
+    address: String
+    userType: UserType!
+    
+    # Thông tin cho nhân vật
+    characterName: String
+    animeMangaSource: String
+    characterDescription: String
+    avatarUrl: String
+    coverImageUrl: String
+    characterStatus: String
+    
+    # Thông tin cho người dùng thật
+    bio: String
+    profilePictureUrl: String
+    dateOfBirth: String
+    gender: String
+    location: String
+    
+    # Thông tin chung
+    createdAt: String
+    updatedAt: String
+    isLoggedIn: Boolean!
+    isVerified: Boolean!
+    isActive: Boolean!
+}
+
+input CreateUserInput {
+    username: String!
+    fullName: String!
+    email: String
+    phoneNumber: String
+    address: String
+    userType: UserType!
+    bio: String
+    profilePictureUrl: String
+    dateOfBirth: String
+    gender: String
+    location: String
+    characterName: String
+    animeMangaSource: String
+    characterDescription: String
+    avatarUrl: String
+    coverImageUrl: String
+}
+
+input UpdateUserInput {
+    fullName: String
+    email: String
+    phoneNumber: String
+    address: String
+    bio: String
+    profilePictureUrl: String
+    dateOfBirth: String
+    gender: String
+    location: String
+    characterName: String
+    animeMangaSource: String
+    characterDescription: String
+    avatarUrl: String
+    coverImageUrl: String
+}
+
+enum UserType {
+    ADMIN
+    REAL_USER
+    CHARACTER
+}
