@@ -1,48 +1,126 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "UserApplication",
-            "request": "launch",
-            "mainClass": "com.sss.user.UserApplication",
-            "projectName": "user"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch SSS Web",
-            "cwd": "${workspaceFolder}/sss-web",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["start"],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "env": {
-                "BROWSER": "none"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch SSS Web (Debug)",
-            "cwd": "${workspaceFolder}/sss-web",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["start"],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "env": {
-                "BROWSER": "none",
-                "GENERATE_SOURCEMAP": "false"
-            }
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
+      "name": "UserApplication",
+      "request": "launch",
+      "mainClass": "com.sss.user.UserApplication",
+      "projectName": "user"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch SSS Web",
+      "cwd": "${workspaceFolder}/sss-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "BROWSER": "none"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch SSS Web (Debug)",
+      "cwd": "${workspaceFolder}/sss-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "BROWSER": "none",
+        "GENERATE_SOURCEMAP": "false"
+      }
+    },
+    {
+      "name": "🚀 Start Development Server",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "cwd": "${workspaceFolder}/sss-web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "BROWSER": "none"
+      }
+    },
+    {
+      "name": "🔧 Generate Relay Types",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "relay"],
+      "cwd": "${workspaceFolder}/sss-web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "👀 Relay Watch Mode",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "relay:watch"],
+      "cwd": "${workspaceFolder}/sss-web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "🏗️ Build Production",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "build"],
+      "cwd": "${workspaceFolder}/sss-web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "🧪 Run Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["test"],
+      "cwd": "${workspaceFolder}/sss-web",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🔍 Relay + Web",
+      "configurations": [
+        "🔧 Generate Relay Types",
+        "🚀 Start Development Server"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "Relay Development",
+        "order": 1
+      }
+    },
+    {
+      "name": "👀 Relay Watch + Web",
+      "configurations": [
+        "👀 Relay Watch Mode",
+        "🚀 Start Development Server"
+      ],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "Relay Development",
+        "order": 2
+      }
+    }
+  ]
 }

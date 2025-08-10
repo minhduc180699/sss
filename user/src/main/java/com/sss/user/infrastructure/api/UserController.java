@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,6 +30,77 @@ public class UserController {
 
   private final UserService userService;
   private final UserSyncService userSyncService;
+
+  @GetMapping
+  public ResponseEntity<Map<String, Object>> getUsers(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String userType,
+      @RequestParam(required = false) String search) {
+    try {
+      log.info("🔍 Getting users with page={}, size={}, userType={}, search={}", page, size, userType, search);
+      
+      // Get all users from service
+      List<User> allUsers = userService.getAllUsers();
+      
+      // Apply filters
+      List<User> filteredUsers = allUsers.stream()
+          .filter(user -> {
+            // Filter by userType if specified
+            if (userType != null && !userType.isEmpty()) {
+              if (!user.getUserType().toString().equalsIgnoreCase(userType)) {
+                return false;
+              }
+            }
+            
+            // Filter by search term if specified
+            if (search != null && !search.isEmpty()) {
+              String searchLower = search.toLowerCase();
+              return user.getUsername().toLowerCase().contains(searchLower) ||
+                     (user.getFullName() != null && user.getFullName().toLowerCase().contains(searchLower)) ||
+                     (user.getEmail() != null && user.getEmail().toLowerCase().contains(searchLower));
+            }
+            
+            return true;
+          })
+          .collect(java.util.stream.Collectors.toList());
+      
+      // Apply pagination
+      int totalUsers = filteredUsers.size();
+      int totalPages = (int) Math.ceil((double) totalUsers / size);
+      int startIndex = page * size;
+      int endIndex = Math.min(startIndex + size, totalUsers);
+      
+      List<User> paginatedUsers = filteredUsers.subList(startIndex, endIndex);
+      
+      // Convert to response format
+      List<Map<String, Object>> userDataList = paginatedUsers.stream()
+          .map(this::convertUserToMap)
+          .collect(java.util.stream.Collectors.toList());
+      
+      Map<String, Object> paginationInfo = new HashMap<>();
+      paginationInfo.put("page", page);
+      paginationInfo.put("size", size);
+      paginationInfo.put("totalElements", totalUsers);
+      paginationInfo.put("totalPages", totalPages);
+      paginationInfo.put("hasNext", page < totalPages - 1);
+      paginationInfo.put("hasPrevious", page > 0);
+      
+      Map<String, Object> apiResponse = new HashMap<>();
+      apiResponse.put("success", true);
+      apiResponse.put("data", userDataList);
+      apiResponse.put("pagination", paginationInfo);
+      apiResponse.put("message", "Users retrieved successfully");
+      
+      return ResponseEntity.ok(apiResponse);
+    } catch (Exception e) {
+      log.error("❌ Error getting users: {}", e.getMessage());
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("success", false);
+      errorResponse.put("message", e.getMessage());
+      return ResponseEntity.status(500).body(errorResponse);
+    }
+  }
 
   @GetMapping("/me")
   public ResponseEntity<Map<String, Object>> getCurrentUser(Authentication authentication) {

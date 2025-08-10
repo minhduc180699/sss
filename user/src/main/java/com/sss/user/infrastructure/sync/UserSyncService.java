@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service để đồng bộ user data giữa Keycloak và MongoDB
@@ -25,6 +26,41 @@ public class UserSyncService {
 
     private final UserService userService;
     private final KeycloakUserService keycloakUserService;
+
+    /**
+     * Đồng bộ user từ token data (không phải JWT object)
+     * Sử dụng cho trường hợp BE gọi Keycloak trực tiếp
+     */
+    public User syncUserFromTokenData(Map<String, Object> tokenData) {
+        log.info("🔄 Starting user sync from token data");
+        
+        String username = (String) tokenData.get("preferred_username");
+        String email = (String) tokenData.get("email");
+        String fullName = (String) tokenData.get("name");
+        String firstName = (String) tokenData.get("given_name");
+        String lastName = (String) tokenData.get("family_name");
+        
+        // Extract roles from token data
+        List<String> roles = extractRolesFromTokenData(tokenData);
+        UserType userType = mapRolesToUserType(roles);
+        
+        log.info("🔍 Syncing user: {} with roles: {}", username, roles);
+        
+        try {
+            // Try to find existing user
+            User existingUser = userService.findByUsername(username);
+            log.info("✅ Found existing user: {}", username);
+            
+            // Update user info from Keycloak if changed
+            return updateUserFromKeycloak(existingUser, email, fullName, userType);
+            
+        } catch (UserNotFoundException e) {
+            log.info("🔄 User not found, creating new user from Keycloak: {}", username);
+            
+            // Create new user
+            return createUserFromKeycloak(username, email, fullName, userType);
+        }
+    }
 
     /**
      * Đồng bộ user từ Keycloak JWT token
@@ -127,6 +163,35 @@ public class UserSyncService {
         
         // Fallback: check resource_access for client-specific roles
         Object resourceAccess = jwt.getClaim("resource_access");
+        if (resourceAccess instanceof java.util.Map) {
+            Object clientAccess = ((java.util.Map<String, Object>) resourceAccess).get("sss-backend");
+            if (clientAccess instanceof java.util.Map) {
+                Object clientRoles = ((java.util.Map<String, Object>) clientAccess).get("roles");
+                if (clientRoles instanceof List) {
+                    return (List<String>) clientRoles;
+                }
+            }
+        }
+        
+        return List.of(); // Return empty list if no roles found
+    }
+
+    /**
+     * Extract roles từ token data
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> extractRolesFromTokenData(Map<String, Object> tokenData) {
+        // Keycloak stores roles in realm_access.roles
+        Object realmAccess = tokenData.get("realm_access");
+        if (realmAccess instanceof java.util.Map) {
+            Object roles = ((java.util.Map<String, Object>) realmAccess).get("roles");
+            if (roles instanceof List) {
+                return (List<String>) roles;
+            }
+        }
+        
+        // Fallback: check resource_access for client-specific roles
+        Object resourceAccess = tokenData.get("resource_access");
         if (resourceAccess instanceof java.util.Map) {
             Object clientAccess = ((java.util.Map<String, Object>) resourceAccess).get("sss-backend");
             if (clientAccess instanceof java.util.Map) {
